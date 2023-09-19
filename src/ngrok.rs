@@ -13,8 +13,9 @@ pub mod ngrok
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct NgrokTunnel {
+        #[serde(default)]
         #[serde(rename = "ID")]
-        pub id: String,
+        pub id: Option<String>,
         pub name: String,
         pub uri: String,
         pub public_url: String,
@@ -38,7 +39,7 @@ pub mod ngrok
             .unwrap();
 
         if cfg!(debug_assertions) {
-            eprintln!("Ngrok JSON: {:?}", json)
+            eprintln!(" ❗  Ngrok JSON: {:?}", json)
         }
 
         serde_json::from_str::<NgrokApiResponse>(&json).unwrap()
