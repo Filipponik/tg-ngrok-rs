@@ -5,6 +5,14 @@ pub mod ngrok
 
     const NGROK_URL: &str = "http://localhost:4040/api/tunnels";
 
+    #[derive(Debug)]
+    pub enum NgrokError {
+        HttpRequestFailed,
+        HttpResponseGetTextFailed,
+        HttpResponseParseFailed,
+        HttpFindTunnelUrlFailed
+    }
+
     #[derive(Serialize, Deserialize, Debug)]
     pub struct NgrokTunnelConfig {
         pub addr: String,
@@ -29,19 +37,16 @@ pub mod ngrok
         pub uri: String,
     }
 
-    pub async fn request_ngrok() -> NgrokApiResponse {
-        // chaining .await will yield our query result
-        let json: String = reqwest::get(NGROK_URL)
-            .await
-            .unwrap()
-            .text()
-            .await
-            .unwrap();
+    pub async fn request_ngrok() -> Result<NgrokApiResponse, NgrokError> {
+        let json: String = match reqwest::get(NGROK_URL).await {
+            Ok(resp) => { resp.text().await.unwrap() }
+            Err(_) => { return Err(NgrokError::HttpRequestFailed); }
+        };
 
         if cfg!(debug_assertions) {
             eprintln!(" ❗  Ngrok JSON: {:?}", json)
         }
 
-        serde_json::from_str::<NgrokApiResponse>(&json).unwrap()
+        Ok(serde_json::from_str::<NgrokApiResponse>(&json).unwrap())
     }
 }

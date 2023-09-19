@@ -16,20 +16,26 @@ async fn main() -> Result<(), String> {
         }
     };
 
-    handle(&args.relative_path, &args.token).await;
-
-    Ok(())
+    handle(&args.relative_path, &args.token).await
 }
 
-async fn handle(relative_url: &str, token: &str) -> () {
-    let ngrok_info: NgrokApiResponse = request_ngrok().await;
+async fn handle(relative_url: &str, token: &str) -> Result<(), String> {
+    let ngrok_info: NgrokApiResponse = match request_ngrok().await {
+        Ok(parsed_args) => parsed_args,
+        Err(error_type) => {
+            return Err(format!(" ❌  Ngrok URL not found: {:?}", error_type))
+        }
+    };
+
     let ngrok_url: &str = &ngrok_info
         .tunnels[0]
         .public_url
         .to_string()
         .add(relative_url);
-    println!(" ✅  Found ngrok url: {ngrok_url}");
+    println!(" ✅  Found ngrok URL: {ngrok_url}");
 
     let result: GoodTelegramResponse = set_webhook_telegram(token, ngrok_url).await;
-    println!(" ✅  OK: {}", result.description)
+    println!(" ✅  OK: {}", result.description);
+
+    Ok(())
 }
