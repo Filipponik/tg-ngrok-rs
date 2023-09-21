@@ -2,9 +2,8 @@ pub mod ngrok;
 pub mod telegram;
 pub mod parse_arguments;
 
-use std::ops::Add;
-use crate::ngrok::ngrok::{NgrokApiResponse, request_ngrok};
-use crate::telegram::telegram::{GoodTelegramResponse, set_webhook_telegram};
+use crate::ngrok::ngrok::{NgrokApiResponse, request_ngrok, get_webhook_url};
+use crate::telegram::telegram::{GoodTelegramResponse, set_bot_webhook};
 use crate::parse_arguments::parse_arguments::{TelegramArguments, parse_args};
 
 #[tokio::main]
@@ -27,14 +26,10 @@ async fn handle(relative_url: &str, token: &str) -> Result<(), String> {
         }
     };
 
-    let ngrok_url: &str = &ngrok_info
-        .tunnels[0]
-        .public_url
-        .to_string()
-        .add(relative_url);
+    let ngrok_url: &str = &get_webhook_url(&ngrok_info, relative_url);
     println!(" ✅  Found ngrok URL: {ngrok_url}");
 
-    let result: GoodTelegramResponse = set_webhook_telegram(token, ngrok_url).await;
+    let result: GoodTelegramResponse = set_bot_webhook(token, ngrok_url).await;
     println!(" ✅  OK: {}", result.description);
 
     Ok(())

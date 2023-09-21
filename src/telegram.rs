@@ -9,7 +9,7 @@ pub mod telegram {
         pub description: String,
     }
 
-    pub async fn set_webhook_telegram(token: &str, url: &str) -> GoodTelegramResponse {
+    pub async fn set_bot_webhook(token: &str, url: &str) -> GoodTelegramResponse {
         let url: String = get_telegram_link(token, url);
         println!(" ✅  Telegram link: {url}");
         let json: String = reqwest::get(url).await.unwrap().text().await.unwrap();

@@ -1,5 +1,6 @@
 pub mod ngrok
 {
+    use std::ops::Add;
     use reqwest;
     use serde::{Deserialize, Serialize};
 
@@ -48,5 +49,14 @@ pub mod ngrok
         }
 
         Ok(serde_json::from_str::<NgrokApiResponse>(&json).unwrap())
+    }
+
+    pub fn get_webhook_url(ngrok_info: &NgrokApiResponse, relative_url: &str) -> String
+    {
+        ngrok_info
+            .tunnels[0]
+            .public_url
+            .to_string()
+            .add(relative_url)
     }
 }
