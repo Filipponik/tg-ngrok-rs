@@ -2,8 +2,8 @@ pub mod ngrok;
 pub mod telegram;
 pub mod parse_arguments;
 
-use crate::ngrok::ngrok::{request_ngrok};
-use crate::telegram::telegram::{GoodTelegramResponse, set_bot_webhook};
+use crate::ngrok::request_ngrok;
+use crate::telegram::{GoodTelegramResponse, set_bot_webhook};
 use crate::parse_arguments::parse_arguments::{TelegramArguments, parse_args};
 
 #[tokio::main]
