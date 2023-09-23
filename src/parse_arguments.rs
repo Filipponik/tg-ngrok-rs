@@ -10,9 +10,7 @@ pub mod parse_arguments {
     }
 
     pub fn parse_args() -> Result<TelegramArguments, String> {
-        let args: Vec<String> = env::args()
-            .skip(1)
-            .collect();
+        let args: Vec<String> = env::args().skip(1).collect();
 
         if cfg!(debug_assertions) {
             eprintln!(" ❗  Arguments found: {args:?}")
@@ -23,7 +21,7 @@ pub mod parse_arguments {
         } else {
             Ok(TelegramArguments {
                 relative_path: args[0].to_string(),
-                token: args[1].to_string()
+                token: args[1].to_string(),
             })
         }
     }

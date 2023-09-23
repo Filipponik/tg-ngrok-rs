@@ -1,10 +1,10 @@
 pub mod ngrok;
-pub mod telegram;
 pub mod parse_arguments;
+pub mod telegram;
 
 use crate::ngrok::request_ngrok;
-use crate::telegram::{GoodTelegramResponse, set_bot_webhook};
-use crate::parse_arguments::parse_arguments::{TelegramArguments, parse_args};
+use crate::parse_arguments::parse_arguments::{parse_args, TelegramArguments};
+use crate::telegram::{set_bot_webhook, GoodTelegramResponse};
 
 #[tokio::main]
 async fn main() -> Result<(), String> {

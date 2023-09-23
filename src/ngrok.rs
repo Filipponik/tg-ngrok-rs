@@ -1,6 +1,6 @@
-use std::ops::Add;
 use reqwest;
 use serde::{Deserialize, Serialize};
+use std::ops::Add;
 
 const NGROK_URL: &str = "http://localhost:4040/api/tunnels";
 
@@ -9,7 +9,7 @@ pub enum NgrokError {
     HttpRequestFailed,
     HttpResponseGetTextFailed,
     HttpResponseParseFailed,
-    HttpFindTunnelUrlFailed
+    HttpFindTunnelUrlFailed,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -40,7 +40,7 @@ impl NgrokApiResponse {
     pub fn get_webhook_url(&self, relative_url: &str) -> Result<String, NgrokError> {
         match self.tunnels.get(0) {
             Some(tunnel) => Ok(tunnel.public_url.to_string().add(relative_url)),
-            None => Err(NgrokError::HttpFindTunnelUrlFailed)
+            None => Err(NgrokError::HttpFindTunnelUrlFailed),
         }
     }
 }
@@ -57,8 +57,7 @@ pub async fn request_ngrok() -> Result<NgrokApiResponse, NgrokError> {
         eprintln!(" ❗  Ngrok JSON: {json:?}")
     }
 
-    serde_json::from_str::<NgrokApiResponse>(&json)
-        .map_err(|_| NgrokError::HttpResponseParseFailed)
+    serde_json::from_str::<NgrokApiResponse>(&json).map_err(|_| NgrokError::HttpResponseParseFailed)
 }
 
 #[cfg(test)]
@@ -77,9 +76,7 @@ mod tests {
 
     #[test]
     fn get_webhook_url_positive() {
-        let data_provider = [
-            ["/url", "https://example.com/url"],
-        ];
+        let data_provider = [["/url", "https://example.com/url"]];
 
         data_provider.iter().for_each(|data| {
             let api_response: NgrokApiResponse = NgrokApiResponse {
