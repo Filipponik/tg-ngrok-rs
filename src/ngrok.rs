@@ -60,3 +60,46 @@ pub async fn request_ngrok() -> Result<NgrokApiResponse, NgrokError> {
     serde_json::from_str::<NgrokApiResponse>(&json)
         .map_err(|_| NgrokError::HttpResponseParseFailed)
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::ngrok::{NgrokApiResponse, NgrokError, NgrokTunnel, NgrokTunnelConfig};
+
+    #[test]
+    fn get_webhook_url_negative() {
+        let api_response: NgrokApiResponse = NgrokApiResponse {
+            tunnels: vec![],
+            uri: "123".to_string(),
+        };
+
+        assert!(api_response.get_webhook_url("url").is_err());
+    }
+
+    #[test]
+    fn get_webhook_url_positive() {
+        let data_provider = [
+            ["/url", "https://example.com/url"],
+        ];
+
+        data_provider.iter().for_each(|data| {
+            let api_response: NgrokApiResponse = NgrokApiResponse {
+                tunnels: vec![NgrokTunnel {
+                    id: None,
+                    name: "console".to_string(),
+                    uri: "/api/tunnels/command_line".to_string(),
+                    public_url: "https://example.com".to_string(),
+                    proto: "https".to_string(),
+                    config: NgrokTunnelConfig {
+                        addr: "https://localhost".to_string(),
+                        inspect: true,
+                    },
+                }],
+                uri: "/api/tunnels".to_string(),
+            };
+
+            let result: Result<String, NgrokError> = api_response.get_webhook_url(data[0]);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap(), data[1]);
+        });
+    }
+}

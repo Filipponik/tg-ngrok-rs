@@ -35,3 +35,21 @@ pub async fn set_bot_webhook(token: &str, url: &str) -> Result<GoodTelegramRespo
 pub fn get_telegram_link(token: &str, url: &str) -> String {
     format!("https://api.telegram.org/bot{token}/setWebhook?url={url}")
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::telegram::get_telegram_link;
+
+    #[test]
+    fn get_telegram_link_positive() {
+        let data_provider = [
+            ["token", "url", "https://api.telegram.org/bottoken/setWebhook?url=url"],
+            ["token1", "url1", "https://api.telegram.org/bottoken1/setWebhook?url=url1"],
+            ["", "/", "https://api.telegram.org/bot/setWebhook?url=/"],
+        ];
+
+        data_provider.iter().for_each(|data| {
+            assert_eq!(get_telegram_link(data[0], data[1]), data[2].to_string());
+        });
+    }
+}
