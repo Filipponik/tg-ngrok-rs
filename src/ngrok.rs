@@ -39,23 +39,26 @@ pub mod ngrok
     }
 
     pub async fn request_ngrok() -> Result<NgrokApiResponse, NgrokError> {
-        let json: String = match reqwest::get(NGROK_URL).await {
-            Ok(resp) => { resp.text().await.unwrap() }
-            Err(_) => { return Err(NgrokError::HttpRequestFailed); }
-        };
+        let json: String = reqwest::get(NGROK_URL)
+            .await
+            .map_err(|_| NgrokError::HttpRequestFailed)
+            .map(|resp| resp.text())?
+            .await
+            .map_err(|_| NgrokError::HttpResponseGetTextFailed)?;
 
         if cfg!(debug_assertions) {
             eprintln!(" ❗  Ngrok JSON: {json:?}")
         }
 
-        Ok(serde_json::from_str::<NgrokApiResponse>(&json).unwrap())
+        serde_json::from_str::<NgrokApiResponse>(&json)
+            .map_err(|_| NgrokError::HttpResponseParseFailed)
     }
 
     pub fn get_webhook_url(ngrok_info: &NgrokApiResponse, relative_url: &str) -> Result<String, NgrokError>
     {
         match ngrok_info.tunnels.get(0) {
-            None => { Err(NgrokError::HttpFindTunnelUrlFailed) }
             Some(tunnel) => { Ok(tunnel.public_url.to_string().add(relative_url)) }
+            None => { Err(NgrokError::HttpFindTunnelUrlFailed) }
         }
     }
 }

@@ -1,6 +1,8 @@
 pub mod parse_arguments {
     use std::env;
 
+    const ARGUMENTS_NEEDED: u8 = 2;
+
     #[derive(Debug)]
     pub struct TelegramArguments {
         pub relative_path: String,
@@ -16,13 +18,13 @@ pub mod parse_arguments {
             eprintln!(" ❗  Arguments found: {args:?}")
         }
 
-        if args.len() != 2 {
-            return Err("Count of arguments is not 2".to_string())
+        if args.len() != ARGUMENTS_NEEDED as usize {
+            Err(format!("Count of arguments is not {ARGUMENTS_NEEDED}"))
+        } else {
+            Ok(TelegramArguments {
+                relative_path: args[0].to_string(),
+                token: args[1].to_string()
+            })
         }
-
-        Ok(TelegramArguments {
-            relative_path: args[0].to_string(),
-            token: args[1].to_string()
-        })
     }
 }

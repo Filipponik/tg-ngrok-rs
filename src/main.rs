@@ -2,7 +2,7 @@ pub mod ngrok;
 pub mod telegram;
 pub mod parse_arguments;
 
-use crate::ngrok::ngrok::{NgrokApiResponse, request_ngrok, get_webhook_url, NgrokError};
+use crate::ngrok::ngrok::{NgrokApiResponse, request_ngrok, get_webhook_url};
 use crate::telegram::telegram::{GoodTelegramResponse, set_bot_webhook};
 use crate::parse_arguments::parse_arguments::{TelegramArguments, parse_args};
 
@@ -23,16 +23,23 @@ async fn handle(relative_url: &str, token: &str) -> Result<(), String> {
 
     println!(" ✅  Found ngrok URL: {ngrok_url}");
 
-    let result: GoodTelegramResponse = set_bot_webhook(token, &ngrok_url).await;
+    let result: GoodTelegramResponse = set_bot_webhook(token, &ngrok_url)
+        .await
+        .map_err(telegram_err_to_string)?;
+
     println!(" ✅  OK: {}", result.description);
 
     Ok(())
 }
 
-fn ngrok_err_to_string(error_type: NgrokError) -> String {
-    format!(" ❌  Ngrok URL not found: {error_type:?}", )
+fn ngrok_err_to_string(error_type: ngrok::NgrokError) -> String {
+    format!(" ❌  Ngrok URL not found: {error_type:?}")
 }
 
 fn parse_err_to_string(_s: String) -> String {
     format!(" ❌  Failed parsing arguments: {_s}")
+}
+
+fn telegram_err_to_string(error_type: telegram::TelegramError) -> String {
+    format!(" ❌  Failed set telegram webhook: {error_type:?}")
 }
