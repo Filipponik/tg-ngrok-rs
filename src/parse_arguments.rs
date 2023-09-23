@@ -13,7 +13,7 @@ pub mod parse_arguments {
             .collect();
 
         if cfg!(debug_assertions) {
-            eprintln!(" ❗  Arguments found: {:?}", args)
+            eprintln!(" ❗  Arguments found: {args:?}")
         }
 
         if args.len() != 2 {

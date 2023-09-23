@@ -45,18 +45,17 @@ pub mod ngrok
         };
 
         if cfg!(debug_assertions) {
-            eprintln!(" ❗  Ngrok JSON: {:?}", json)
+            eprintln!(" ❗  Ngrok JSON: {json:?}")
         }
 
         Ok(serde_json::from_str::<NgrokApiResponse>(&json).unwrap())
     }
 
-    pub fn get_webhook_url(ngrok_info: &NgrokApiResponse, relative_url: &str) -> String
+    pub fn get_webhook_url(ngrok_info: &NgrokApiResponse, relative_url: &str) -> Result<String, NgrokError>
     {
-        ngrok_info
-            .tunnels[0]
-            .public_url
-            .to_string()
-            .add(relative_url)
+        match ngrok_info.tunnels.get(0) {
+            None => { Err(NgrokError::HttpFindTunnelUrlFailed) }
+            Some(tunnel) => { Ok(tunnel.public_url.to_string().add(relative_url)) }
+        }
     }
 }

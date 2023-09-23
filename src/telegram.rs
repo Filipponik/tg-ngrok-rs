@@ -15,7 +15,7 @@ pub mod telegram {
         let json: String = reqwest::get(url).await.unwrap().text().await.unwrap();
 
         if cfg!(debug_assertions) {
-            eprintln!(" ❗  Telegram JSON: {:?}", json)
+            eprintln!(" ❗  Telegram JSON: {json:?}")
         }
 
         serde_json::from_str::<GoodTelegramResponse>(&json).unwrap()
