@@ -2,7 +2,7 @@ pub mod ngrok;
 pub mod telegram;
 pub mod parse_arguments;
 
-use crate::ngrok::ngrok::{NgrokApiResponse, request_ngrok, get_webhook_url};
+use crate::ngrok::ngrok::{request_ngrok};
 use crate::telegram::telegram::{GoodTelegramResponse, set_bot_webhook};
 use crate::parse_arguments::parse_arguments::{TelegramArguments, parse_args};
 
@@ -14,11 +14,10 @@ async fn main() -> Result<(), String> {
 }
 
 async fn handle(relative_url: &str, token: &str) -> Result<(), String> {
-    let ngrok_info: NgrokApiResponse = request_ngrok()
+    let ngrok_url: String = request_ngrok()
         .await
-        .map_err(ngrok_err_to_string)?;
-
-    let ngrok_url: String = get_webhook_url(&ngrok_info, relative_url)
+        .map_err(ngrok_err_to_string)?
+        .get_webhook_url(relative_url)
         .map_err(ngrok_err_to_string)?;
 
     println!(" ✅  Found ngrok URL: {ngrok_url}");

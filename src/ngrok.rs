@@ -38,6 +38,12 @@ pub mod ngrok
         pub uri: String,
     }
 
+    impl NgrokApiResponse {
+        pub fn get_webhook_url(&self, relative_url: &str) -> Result<String, NgrokError> {
+            get_webhook_url(&self, relative_url)
+        }
+    }
+
     pub async fn request_ngrok() -> Result<NgrokApiResponse, NgrokError> {
         let json: String = reqwest::get(NGROK_URL)
             .await
