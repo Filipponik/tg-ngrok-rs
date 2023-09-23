@@ -5,6 +5,7 @@ Parses your opened ngrok tunnels and sets Telegram webhook to HTTPS.
 ## Installation
 ```shell
 git clone git@github.com:Filipponik/tg-ngrok-rs.git
+cd tg-ngrok-rs
 cargo build --release
 ```
 
@@ -16,4 +17,9 @@ cargo build --release
 ### Example:
 ```shell
 ./target/release/tg-ngrok-rs /webhooks/telegram 1234567890:AAbbccddeeffgghhiijjkk1234567890
+```
+
+## Running tests
+```shell
+cargo test
 ```
